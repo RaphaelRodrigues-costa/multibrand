@@ -9,11 +9,11 @@
     <div class="collapse navbar-collapse" id="conteudoNavbarSuportado">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
-                <a class="nav-link" href="{{route('dashboard')}}">Dashboard</a>
+                <a class="nav-link" href="{{route('dashboard')}}">Carregar carros</a>
             </li>
 
             <li class="nav-item active">
-                <a class="nav-link" href="{{route('cars-list')}}">Lista de Veiculos</a>
+                <a class="nav-link" href="{{route('cars.index')}}">Lista de Veiculos</a>
             </li>
 
             <li class="nav-item active">
@@ -23,7 +23,7 @@
     </div>
 </nav>
 <main style="width: 50%; margin: 0 auto;">
-    <form method="post" action="{{ route('cars') }}" style=" margin-top: 40px; ">
+    <form method="post" action="{{ route('cars.store') }}" style=" margin-top: 40px; ">
         @csrf
         <div style="display: flex; align-items: center; margin-bottom: 10px;">
             <input type="text" class="form-control" id="brand" name="brand" style="margin-right: 10px;"
