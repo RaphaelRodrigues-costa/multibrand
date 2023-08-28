@@ -4,6 +4,7 @@
 
 - cp .env.example .env - Para criar o arquivo .env pela .env.example
 - php artisan key:generate  - Para adicionar a chave APP_KEY no .env
+- php artisan migrate:fresh  - Para rodar as migrates
 - composer install - Para instalar as dependências do composer
 - npm install - Para instalar as dependências do npm
 - npm run build - Para buildar o css e js
