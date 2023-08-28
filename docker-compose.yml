@@ -1,0 +1,8 @@
+services:
+  mysql:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: multibrand
+      MYSQL_USER: admin@admin.com
+      MYSQL_PASSWORD: admin
