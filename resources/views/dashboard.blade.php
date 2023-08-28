@@ -5,23 +5,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
 <body style="background-color: #DEE8E9">
-<nav class="navbar navbar-expand-lg navbar-light bg-light" style=" margin-bottom: 10px;">
-    <div class="collapse navbar-collapse" id="conteudoNavbarSuportado">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-                <a class="nav-link" href="{{route('dashboard')}}">Carregar carros</a>
-            </li>
-
-            <li class="nav-item active">
-                <a class="nav-link" href="{{route('cars.index')}}">Lista de Veiculos</a>
-            </li>
-
-            <li class="nav-item active">
-                <a class="nav-link" href="{{route('profile.edit')}}">Perfil</a>
-            </li>
-        </ul>
-    </div>
-</nav>
+@component('components.navigation')
+@endcomponent
 <main style="width: 50%; margin: 0 auto;">
     <form method="post" action="{{ route('cars.store') }}" style=" margin-top: 40px; ">
         @csrf
