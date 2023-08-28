@@ -13,9 +13,8 @@ class CreateCarUseCase
 
     }
 
-    public function execute(array $params): int
+    public function execute(array $params): void
     {
-
-        return $this->model->create($params);
+        $this->model->createOrUpdate($params);
     }
 }

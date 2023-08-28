@@ -42,28 +42,26 @@ class Car extends Model
         $this->query()->where('id', $id)->delete();
     }
 
-    public function create($params): int
+    public function createOrUpdate($params): void
     {
-        return $this->query()->upsert(
-            $params,
-            [
-                'link',
-                'kilometers',
-                'color',
-            ],
-            [
-                'car_name',
-                'link',
-                'link_image',
-                'year',
-                'fuel',
-                'doors',
-                'kilometers',
-                'gearbox',
-                'color',
-                'price',
-            ]
-        );
+        $links = array_map(fn($item) => $item['link'], $params);
+        $existOneCarWithLink = $this->newQuery()->whereIn('link', $links)->get();
+
+        $existOneCarWithLink->each(function (Car $item) use ($params) {
+            $car = collect($params)->first(function ($value) use ($item) {
+                return $value['link'] === $item['link'];
+            });
+            $item->update($car);
+        });
+
+        $cars = collect($params)->filter(function ($value) use ($existOneCarWithLink) {
+
+            return $existOneCarWithLink->whereIn('link', $value['link'])->isEmpty();
+        })->values()->toArray();
+
+        if (!blank($cars)) {
+            $this->newQuery()->insert($cars);
+        }
     }
 
     public function findByName($param)
