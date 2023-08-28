@@ -19,50 +19,32 @@ class CarController extends Controller
 {
     protected function parameters(Car $car): ListAllCarsVO
     {
+        $car = $car->toArray();
+
         $carsListVo = new ListAllCarsVO();
 
-        $carsListVo->id = $car->getAttributes()['id'];
-        $carsListVo->carName = $car->getAttributes()['car_name'];
-        $carsListVo->link = $car->getAttributes()['link'];
-        $carsListVo->linkImage = $car->getAttributes()['link_image'];
-        $carsListVo->year = $car->getAttributes()['year'];
-        $carsListVo->fuel = $car->getAttributes()['fuel'];
-        $carsListVo->doors = $car->getAttributes()['doors'];
-        $carsListVo->kilometers = $car->getAttributes()['kilometers'];
-        $carsListVo->gearbox = $car->getAttributes()['gearbox'];
-        $carsListVo->color = $car->getAttributes()['color'];
-        $carsListVo->price = $car->getAttributes()['price'];
+        $carsListVo->id = $car['id'];
+        $carsListVo->carName = $car['car_name'];
+        $carsListVo->link = $car['link'];
+        $carsListVo->linkImage = $car['link_image'];
+        $carsListVo->year = $car['year'];
+        $carsListVo->fuel = $car['fuel'];
+        $carsListVo->doors = $car['doors'];
+        $carsListVo->kilometers = $car['kilometers'];
+        $carsListVo->gearbox = $car['gearbox'];
+        $carsListVo->color = $car['color'];
+        $carsListVo->price = $car['price'];
 
         return $carsListVo;
     }
 
-    public function index(ListCarUseCase $useCase): View|Application|Factory|\Illuminate\Contracts\Foundation\Application
+    public function index(Request $request, ListCarUseCase $useCase): View|Application|Factory|\Illuminate\Contracts\Foundation\Application
     {
-        $cars = $useCase->execute();
+        $cars = $useCase->execute($request->get('name'));
 
         $data = [];
 
         foreach ($cars->items() as $car) {
-            $data[] = $this->parameters($car);
-        }
-
-        return view('list-cars', ['cars' => $data]);
-    }
-
-    public function findByName(Request $request, ShowCarUseCase $useCase): View|Application|Factory|\Illuminate\Contracts\Foundation\Application
-    {
-        $request->validate([
-            'brand' => 'string|required|regex:/^[^0-9]*$/'
-        ], [
-            'brand.string' => 'O campo nome deve ser uma string.',
-            'brand.regex' => 'O campo nome não deve conter números.',
-        ]);
-
-        $cars = $useCase->execute($request->input('brand'));
-
-        $data = [];
-
-        foreach ($cars->all() as $car) {
             $data[] = $this->parameters($car);
         }
 
@@ -78,22 +60,20 @@ class CarController extends Controller
             'brand.regex' => 'O campo nome não deve conter números.',
         ]);
 
-        $brand = $request->input('brand');
-
-        $cars = app(GetCarsQuestMultibrandsTask::class)->execute($brand);
+        $cars = app(GetCarsQuestMultibrandsTask::class)->execute($request->input('brand'));
 
         if (blank($cars)) {
-            return view('dashboard')->with('error', 'Item não encontrado');
+            return view('dashboard')->with('error', 'A marca: ' . $request->input('brand') . ' que você procura não foi encontrada');
         }
 
         $useCase->execute($cars);
 
-        return redirect()->route('cars-list');
+        return redirect()->route('cars.index');
     }
 
     protected function destroy(int $id, DeleteCarUseCase $useCase): RedirectResponse
     {
         $useCase->execute($id);
-        return redirect()->route('cars-list');
+        return redirect()->route('cars.index');
     }
 }

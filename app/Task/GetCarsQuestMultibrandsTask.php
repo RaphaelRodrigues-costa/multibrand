@@ -27,30 +27,44 @@ class GetCarsQuestMultibrandsTask
     {
         $brand = Str::lower($parameter);
 
+        $html = file_get_contents( $this->baseUrl . $brand);
+
         $pattern = '/<div class="card card-car">(.*?)<a href="(.*?)" title="(.*?)">(.*?)<\/div>/s';
 
-        $matches = $this->getContent(url: $this->baseUrl . $brand, pattern: $pattern);
+        preg_match_all(pattern: $pattern, subject: $html, matches: $matches);
 
         $linkToTheVehicle = $matches[2];
 
         if (blank($linkToTheVehicle)) {
-           return null;
+            return null;
         }
 
         $data = [];
+
         foreach ($linkToTheVehicle as $link) {
+            $html = file_get_contents($link);
+            preg_match_all(pattern: $this->linkImage, subject: $html, matches: $linkImages);
+            preg_match_all(pattern: $this->name, subject: $html, matches: $carName);
+            preg_match_all(pattern: $this->fetchParagraphs, subject: $html, matches: $year);
+            preg_match_all(pattern: $this->fetchParagraphs, subject: $html, matches: $fuel);
+            preg_match_all(pattern: $this->fetchParagraphs, subject: $html, matches: $doors);
+            preg_match_all(pattern: $this->fetchParagraphs, subject: $html, matches: $kilometers);
+            preg_match_all(pattern: $this->fetchParagraphs, subject: $html, matches: $gearbox);
+            preg_match_all(pattern: $this->fetchParagraphs, subject: $html, matches: $color);
+            preg_match_all(pattern: $this->price, subject: $html, matches: $price);
+
             $data[] = [
                 'user_id' => Auth::id(),
-                'link_image' => $this->getContent(url: $link, pattern: $this->linkImage)[3][0] ?? null,
-                'car_name' => Str::lower($this->findNameCar($this->getContent(url: $link, pattern: $this->name))) ?? null,
+                'link_image' => $linkImages[3][0] ?? null,
+                'car_name' => Str::lower($this->findNameCar($carName)) ?? null,
                 'link' => $link ?? null,
-                'year' => trim($this->getContent(url: $link, pattern: $this->fetchParagraphs)[2][1]) ?? null,
-                'fuel' => $this->getFoul(link: $link) ?? null,
-                'doors' => $this->numberDoors($this->findNameCar($this->getContent(url: $link, pattern: $this->name))) ?? null,
-                'kilometers' => trim($this->getContent(url: $link, pattern: $this->fetchParagraphs)[2][2]) ?? null,
-                'gearbox' => trim($this->getContent(url: $link, pattern: $this->fetchParagraphs)[2][0]) ?? null,
-                'color' => trim($this->getContent(url: $link, pattern: $this->fetchParagraphs)[2][3]) ?? null,
-                'price' => $this->findPrice($this->getContent(url: $link, pattern: $this->price)) ?? null,
+                'year' => trim($year[2][1]) ?? null,
+                'fuel' => $this->getFoul($fuel) ?? null,
+                'doors' => $this->numberDoors($this->findNameCar($carName)) ?? null,
+                'kilometers' => trim($kilometers[2][2]) ?? null,
+                'gearbox' => trim($gearbox[2][0]) ?? null,
+                'color' => trim($color[2][3]) ?? null,
+                'price' => $this->findPrice($price) ?? null,
             ];
         }
 
@@ -59,7 +73,6 @@ class GetCarsQuestMultibrandsTask
 
     public function getContent(string $url, $pattern): array
     {
-
         $html = file_get_contents($url);
 
         preg_match_all($pattern, $html, $matches);
@@ -81,10 +94,8 @@ class GetCarsQuestMultibrandsTask
         return $price[0] . $price[1];
     }
 
-    protected function getFoul(string $link): ?string
+    protected function getFoul(array $items): ?string
     {
-        $items = $this->getContent(url: $link, pattern: $this->fetchParagraphs);
-
         $foul = [];
 
         foreach ($items[2] as $item) {

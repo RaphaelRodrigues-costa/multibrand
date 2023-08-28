@@ -12,8 +12,8 @@ class ListCarUseCase
 
     }
 
-    public function execute(): LengthAwarePaginator
+    public function execute(?string $name): LengthAwarePaginator
     {
-        return $this->model->newQuery()->paginate();
+        return $this->model->paginate($name);
     }
 }

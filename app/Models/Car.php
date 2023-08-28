@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -68,5 +69,16 @@ class Car extends Model
     public function findByName($param)
     {
         return $this->where('car_name', 'like', '%' . $param . '%')->get();
+    }
+
+    public function paginate(?string $name): LengthAwarePaginator
+    {
+        $queryPaginate = $this->newQuery();
+
+        if (!blank($name)) {
+            $queryPaginate->where('car_name', 'like', '%' . $name . '%');
+        }
+
+        return $queryPaginate->paginate();
     }
 }
