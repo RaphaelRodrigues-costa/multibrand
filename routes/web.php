@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CarController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -14,11 +15,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
 
-Route::get('/dashboard', function () {
+Route::get('/', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -28,13 +26,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-
-    Route::post('/cars', [\App\Http\Controllers\CarController::class, 'store'])->name('cars');
-    Route::get('/cars-list', [\App\Http\Controllers\CarController::class, 'index'])->name('cars-list');
-    Route::get('/cars-filter/name', [\App\Http\Controllers\CarController::class, 'findByName'])->name('cars-show');
-    Route::delete('/cars/{id}/delete', [\App\Http\Controllers\CarController::class, 'destroy'])->name('delete');
-//    Route::get('/filter-brand', [\App\Http\Controllers\CarController::class, 'index'])->name('filter-brand');
-
+    Route::post('/cars', [CarController::class, 'store'])->name('cars.store');
+    Route::get('/cars', [CarController::class, 'index'])->name('cars.index');
+    Route::delete('/cars/{id}/delete', [CarController::class, 'destroy'])->name('cars.delete');
 });
 
 
